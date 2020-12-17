@@ -64,7 +64,6 @@ for epoch in range(5):
         
             loss_list.append(loss.numpy().sum())
             
-        
         grads = tape.gradient(loss, model_params)
     
         optimizer.apply_gradients(zip(grads, model_params))
