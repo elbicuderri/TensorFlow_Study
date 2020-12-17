@@ -1,6 +1,8 @@
 import tensorflow as tf
+import numpy as np
 from tensorflow.python.client import device_lib
 import statistics
+#import tqdm
 
 print(device_lib.list_local_devices())
 # from tensorflow.keras.datasets import fashion_mnist
@@ -8,7 +10,7 @@ print(device_lib.list_local_devices())
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
 
-x_train, x_test = (x_train / 255.0).astype('float32'), (x_test / 255.0).astype('float32')
+x_train, x_test = x_train / np.float32(255.0), x_test / np.float32(255.0)
 
 class Model(tf.keras.Model):
     def __init__(self):
@@ -42,11 +44,13 @@ optimizer = tf.keras.optimizers.Adam(lr=1e-4)
 
 batch_size = 32
 
-loss_dict = {}   
+loss_dict = {}
+t_loss_dict = {}
 
 for epoch in range(5):
     loss_list = []   
-
+    t_loss_list = []
+    
     for i in range(x_train.shape[0] // batch_size):
         
         x_batch = x_train[i * batch_size:(i + 1) * batch_size]
@@ -68,7 +72,28 @@ for epoch in range(5):
     
         optimizer.apply_gradients(zip(grads, model_params))
         
+        x_batch_test = x_test[i * batch_size:(i + 1) * batch_size]
+        y_batch_test = y_test[i * batch_size:(i + 1) * batch_size]
+        
+        x_batch_test = x_batch_test.reshape(-1, 28*28)
+        
+        y_batch_test = tf.one_hot(y_batch_test, 10)
+        
+        t_out = model(x_batch_test)
+        
+        t_loss = loss_fn(t_out, y_batch_test)
+        
+        t_loss_list.append(t_loss.numpy().sum())
+        
     loss_dict[epoch] = statistics.mean(loss_list)
+    t_loss_dict[epoch] = statistics.mean(t_loss_list)
     
     print(loss_dict[epoch])
+    print(t_loss_dict[epoch])
+    print('==================')
+    
+    
+    
+
+    
     
