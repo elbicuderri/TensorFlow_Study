@@ -10,7 +10,6 @@ print(device_lib.list_local_devices())
 
 x_train, x_test = (x_train / 255.0).astype('float32'), (x_test / 255.0).astype('float32')
 
-
 class Model(tf.keras.Model):
     def __init__(self):
         super(Model, self).__init__()
@@ -19,15 +18,23 @@ class Model(tf.keras.Model):
         self.output_layer = tf.keras.layers.Dense(10, activation='softmax')
         
     def call(self, x):
-        out = self.input_layer(x)
-        out = self.hidden_layer(out)
-        out = self.output_layer(out)
-        return out
+        inputs = self.input_layer(x)
+        hidden = self.hidden_layer(inputs)
+        outputs = self.output_layer(hidden)
+        return outputs
     
 model = Model()
 
+# InTensor = x_train[0, :, :]
+# InTensor = InTensor.reshape(-1, 28*28)
+# oot= model(InTensor)
+
 # tf.keras.utils.plot_model(model, show_shapes=True)
 # model.summary()
+
+# model_t = Model(x_test, y_test)
+
+# model_t.summary()
 
 loss_fn = tf.keras.losses.CategoricalCrossentropy(from_logits=False)
 
@@ -65,3 +72,4 @@ for epoch in range(5):
     loss_dict[epoch] = statistics.mean(loss_list)
     
     print(loss_dict[epoch])
+    
