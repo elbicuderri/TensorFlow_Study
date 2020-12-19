@@ -102,24 +102,8 @@ for epoch in range(1, 6):
     if (epoch == 5):
         model.save_weights('model/cifar10_model_5', save_format='tf')
 
-# weights = model.weights
-
-# for i, w in enumerate(weights):
-#     np.save(f"model/cifar10_{i}.npy", w.numpy())
 
 model.save_weights('model/cifar10_model', save_format='tf')
 
-# a = model.weights
-
-# a = np.array(a)
-
-# np.save('model/weight_arr.npy', a)
-
-# try:
-#     a.tofile('model/weights.wts', sep=",")
-# except:
-#     pass
-
-# np.tofile(a, 'model/weights.wts')
 
 print('model saved')
