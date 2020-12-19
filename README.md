@@ -3,9 +3,9 @@
 
 20201219
 
-- tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
-
 ```python
+# tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
+
 dataset = tf.data.Dataset((x_data, y_data)))
 
 data_loader = dataset.batch(batch_size)  ### 여기에 shuffle, map, repeat 같은 다른 옵션이 있다. 
