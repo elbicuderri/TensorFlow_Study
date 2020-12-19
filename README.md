@@ -1,8 +1,6 @@
 # TensorFlow_Study
 
 
-20201219
-
 ```python
 # tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
 
