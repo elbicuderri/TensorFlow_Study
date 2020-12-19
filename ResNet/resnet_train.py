@@ -92,7 +92,8 @@ class SimpleResNet(tf.keras.Model):
         out2 = conv33(filters=32, kernel_size=3, strides=1)(out2)
         out2 = self.batchnorm(out2)
         
-        out2 = concatenate([out2, res2])
+        # out2 = concatenate([out2, res2])
+        out2 += res2
         out2 = self.relu(out2)
         
         res3 = conv33(filters=64, kernel_size=3, strides=2)(out2)
@@ -109,7 +110,8 @@ class SimpleResNet(tf.keras.Model):
         out3 = conv33(filters=64, kernel_size=3, strides=1)(out3)
         out3 = self.batchnorm(out3)
         
-        out3 = concatenate([out3, res3])
+        # out3 = concatenate([out3, res3])
+        out3 += res3
         out3 = self.relu(out3)
         
         out3 = self.avg_pool(out3)
@@ -128,8 +130,10 @@ loss_fn = CategoricalCrossentropy()
 optimizer = Adam(lr=1e-3)
 
 batch_size = 32
+
+epochs = 2
         
-for epoch in range(1, 4):
+for epoch in range(1, epochs + 1):
     loss_list = []   
 
     for i, (img, label) in enumerate(train_loader):
@@ -151,7 +155,7 @@ for epoch in range(1, 4):
     # loss_dict[epoch] = statistics.mean(loss_list)
 
     # print(loss_dict[epoch])
-    print(f"[{epoch}/5] finished")
+    print(f"[{epoch}/{epochs}] finished")
     print('==================')
         
-model.save_weights('cifar10_resnet.wts', save_format='tf')
+model.save_weights('cifar10_resnet', save_format='tf')
