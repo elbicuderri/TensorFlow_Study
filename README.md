@@ -18,6 +18,7 @@ class Model(tf.keras.Model):
     
     self.block = tf.keras.model.Sequential([ ... ]) # 이런 식으론 되지 않았다.
 ```
-
-    
-    out = concatenate([in1, in
+```
+out = concatenate([in1, in2])
+out = in1 + in2 # in1, in2 가 tf.Tensor 일 경우
+```
