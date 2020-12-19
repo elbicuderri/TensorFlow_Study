@@ -4,7 +4,7 @@
 ```python
 # tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
 
-dataset = tf.data.Dataset.from_tensor_slices((x_data, y_data)))
+dataset = tf.data.Dataset.from_tensor_slices((x_data, y_data))
 
 data_loader = dataset.batch(batch_size)  ### 여기에 shuffle, map, repeat 같은 다른 옵션이 있다. 
 
@@ -16,7 +16,7 @@ class Model(tf.keras.Model):
   def __init__(self):
     super().__init__()
     
-    self.block = tf.keras.model.Sequential([ ... ]) # 이런 식으론 되지 않았다.
+    self.block = tf.keras.models.Sequential([ ... ]) # 이런 식으론 되지 않았다. 생각중.
 ```
 
 ```python
