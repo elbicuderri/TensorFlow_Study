@@ -28,7 +28,6 @@ train_loader = train_dataset.batch(32)
 # for something in train_loader.take(1):
 #     print(something)
 
-
 def conv33(filters, kernel_size, strides, padding='same', use_bias=False):
     return tf.keras.layers.Conv2D(
         filters=filters, kernel_size=kernel_size, strides=strides,
@@ -100,19 +99,10 @@ for epoch in range(1, 6):
     print(f"[{epoch}/5] finished")
     print('==================')
 
-model.save_weights('model/cifar10_model.h5')
+    if (epoch == 5):
+        model.save_weights('model/cifar10_model_5', save_format='tf')
 
-a = model.weights
 
-a = np.array(a)
-
-np.save('model/weight_arr.npy', a)
-
-try:
-    a.tofile('model/weights.wts', sep=",")
-except:
-    pass
-
-# np.tofile(a, 'model/weights.wts')
+model.save_weights('model/cifar10_model', save_format='tf')
 
 print('model saved')
