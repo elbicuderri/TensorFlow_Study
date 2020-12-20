@@ -9,7 +9,7 @@ dataset = tf.data.Dataset.from_tensor_slices((x_data, y_data))
 data_loader = dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32, drop_remainder=False)
 
 #preproces : 전처리함수
-#shuffle : dataset 길이만큼 shuffle, reshuffle_each_iteration=False 같은 shuffle 반복
+#shuffle : dataset 길이만큼 shuffle, reshuffle_each_iteration=False 면 같은 shuffle 반복
 #repeat : epoch만큼 반복된 dataset 생성
 #batch: drop_remainder=True 면 마지막 batch_size 보다 작은 data 버림
 
