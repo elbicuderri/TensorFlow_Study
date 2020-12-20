@@ -11,7 +11,7 @@ tf.debugging.set_log_device_placement(True)
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
 
-x_train = x_train.reshape(x_train.shape[0], 32, 32, 3)
+# x_train = x_train.reshape(x_train.shape[0], 32, 32, 3)
 
 # x_test = x_test.reshape(x_test.shape[0], 32, 32, 3)
 
@@ -26,13 +26,13 @@ x_train = x_train.reshape(x_train.shape[0], 32, 32, 3)
 train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 
 def preprocess(x, y):
-    # x = tf.reshape(x, [32, 32, 3])
+    x = tf.reshape(x, [32, 32, 3])
     image = tf.cast(x, tf.float32) / 255.0
     label = tf.one_hot(y, depth=10)
     label = tf.squeeze(label)
     return image, label
 
-train_loader = train_dataset.map(preprocess).batch(32)
+train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32)
 
 # train_loader = train_dataset.batch(32)
 
@@ -88,7 +88,7 @@ batch_size = 32
 # loss_dict = {}
 
 # with tf.device('/GPU:0'):
-for epoch in range(1, 6):
+for epoch in range(1, 4):
     loss_list = []   
 
     for i, (img, label) in enumerate(train_loader):
@@ -114,7 +114,7 @@ for epoch in range(1, 6):
     # loss_dict[epoch] = statistics.mean(loss_list)
 
     # print(loss_dict[epoch])
-    print(f"[{epoch}/5] finished")
+    print(f"[{epoch}/3] finished")
     print('==================')
 
     # if (epoch == 5):
