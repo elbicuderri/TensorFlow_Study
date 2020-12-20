@@ -21,6 +21,8 @@ class LSTMCell(tf.keras.Model):
         self.sigmoid = Activation('sigmoid')
         self.tanh = Activation('tanh')
         
+        self.dot = tf.math.multiply
+        
     def call(self, input, hidden, cell):
         
         i = self.sigmoid(self.ii_layer(input) + self.hi_layer(hidden))
@@ -28,8 +30,11 @@ class LSTMCell(tf.keras.Model):
         g = self.tanh(self.ig_layer(input) + self.hg_layer(hidden))
         out = self.sigmoid(self.io_layer(input) + self.ho_layer(hidden))     
         
-        cell_state = tf.math.multiply(f, cell) + tf.math.multiply(i, g)
-        hidden_state = tf.math.multiply(out, self.tanh(cell_state))
+        # cell_state = tf.math.multiply(f, cell) + tf.math.multiply(i, g)
+        # hidden_state = tf.math.multiply(out, self.tanh(cell_state))
+        
+        cell_state = self.dot(f, cell) + self.dot(i, g)
+        hidden_state = self.dot(out, self.tanh(cell_state))
         
         return out, hidden_state, cell_state
     
@@ -89,5 +94,7 @@ InTensor = tf.random.uniform([seq_len, batch, input_size])
 model = LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=num_layers)
 
 out = model(InTensor)
+
+model.summary()
 
 print(out.shape)
