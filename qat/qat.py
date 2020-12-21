@@ -1,7 +1,12 @@
 import tempfile
 import os
 import tensorflow as tf
+import numpy as np
 from tensorflow import keras
+import tensorflow_model_optimization as tfmot
+
+
+tf.debugging.set_log_device_placement(True)
 
 # Load MNIST dataset
 mnist = keras.datasets.mnist
@@ -33,7 +38,6 @@ model.fit(
   validation_split=0.1,
 )
 
-import tensorflow_model_optimization as tfmot
 
 quantize_model = tfmot.quantization.keras.quantize_model
 
@@ -67,7 +71,6 @@ converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
 quantized_tflite_model = converter.convert()
 
-import numpy as np
 
 def evaluate_model(interpreter):
   input_index = interpreter.get_input_details()[0]["index"]
