@@ -1,5 +1,4 @@
 import tensorflow as tf 
-# from tensorflow.random import uniform 
 
 # matmul
 x = tf.random.uniform([2, 3])
@@ -7,7 +6,7 @@ y = tf.random.uniform([4, 3])
 
 z = tf.einsum("ij, kj->ik", x, y)
 
-print(z)
+print(z.shape)
 
 #Fully Connected Layer
 a = tf.random.uniform([32, 3, 228, 228])
@@ -25,7 +24,3 @@ y2 = tf.einsum("nhwc, hwck-> nk", b, w2.numpy().reshape([228, 228, 3, 10])) #Ten
 print(y1.shape)
 
 print(y2.shape)
-
-print(y1)
-
-print(y2)
