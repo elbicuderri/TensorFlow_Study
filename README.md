@@ -33,6 +33,7 @@ Note that:
 This behavior only occurs as of TensorFlow 2.0. In 1.*, setting layer.trainable = False would freeze the layer but would not switch it to inference mode.
 Setting trainable on an model containing other layers will recursively set the trainable value of all inner layers.
 If the value of the trainable attribute is changed after calling compile() on a model, the new value doesn't take effect for this model until compile() is called again.
+
 Reference:
 Ioffe and Szegedy, 2015.
 
