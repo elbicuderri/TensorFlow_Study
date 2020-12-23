@@ -4,16 +4,16 @@
 ```python
     for i, (img, label) in enumerate(train_loader):
         model_params = model.trainable_variables
-        with tf.GradientTape() as tape:
-            out = model(img)  
+        with tf.GradientTape() as tape: # torch 기준으로는 torch 는 forward를 하면 자동으로 jacobian matrix 을 생성해 autograd를 하기 위해 준비 
+            out = model(img)            # tf 는 tape라는 것으로 감싸놓는 느낌적인 느낌으로 생각하면 된다.
             loss = loss_fn(out, label)
-        grads = tape.gradient(loss, model_params)
-        optimizer.apply_gradients(zip(grads, model_params))
+        grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
+        optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
 **마법의 한 줄**
 ```python
-tf.debugging.set_log_device_placement(True)
+tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
 ```
 
 > 오늘의 과제
