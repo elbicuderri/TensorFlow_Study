@@ -5,19 +5,7 @@
 >
 > 해결 완료
 >
-```python
-self.batchnorm = BatchNormalization(trainable=True)
-...
-model = Model(...)
-...
-model.batchorm.trainable = False 
-## somthing like this? 확인 필요
-## 저렇게 하면 bn의 mean과 var는 어떤걸 사용하는 걸까
-## dropout 은 training 이란 키워드가 있는데 
-## 훈련 중 val_loss 체크를 할때 어떻게 되는 걸까..
-## 은제 확인하냐
-```
-> like thi
+> like this
 ```python
         self.trainable = True
         self.batchnorm = tf.keras.layers.BatchNormalization(trainable=self.trainable)
