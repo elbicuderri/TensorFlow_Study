@@ -1,5 +1,21 @@
 # TensorFlow_Study
 
+> 오늘의 과제
+> TF는 bn 과 dropout을 어떻게 관리하지?
+>
+>
+```python
+self.batchnorm = BatchNormalization(trainable=True)
+...
+model = Model(...)
+...
+model.batchorm.trainable = False 
+## somthing like this? 확인 필요
+## 저렇게 하면 bn의 mean과 var는 어떤걸 사용하는 걸까
+## dropout 은 training 이란 키워드가 있는데 
+## 훈련 중 val_loss 체크를 할때 어떻게 되는 걸까..
+## 은제 확인하냐
+```
 
 ```python
 # tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
