@@ -1,5 +1,16 @@
 # TensorFlow_Study
 
+**외우자 이 다섯줄**
+```python
+    for i, (img, label) in enumerate(train_loader):
+        model_params = model.trainable_variables
+        with tf.GradientTape() as tape:
+            out = model(img)  
+            loss = loss_fn(out, label)
+        grads = tape.gradient(loss, model_params)
+        optimizer.apply_gradients(zip(grads, model_params))
+```
+
 > 오늘의 과제
 > ~~TF는 bn 과 dropout을 어떻게 관리하지?~~
 >
@@ -37,16 +48,6 @@ If the value of the trainable attribute is changed after calling compile() on a 
 Reference:
 Ioffe and Szegedy, 2015.
 
-**외우자 이 다섯줄**
-```python
-    for i, (img, label) in enumerate(train_loader):
-        model_params = model.trainable_variables
-        with tf.GradientTape() as tape:
-            out = model(img)  
-            loss = loss_fn(out, label)
-        grads = tape.gradient(loss, model_params)
-        optimizer.apply_gradients(zip(grads, model_params))
-```
 
 ```python
 # tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
