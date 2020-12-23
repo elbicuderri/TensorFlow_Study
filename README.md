@@ -11,6 +11,11 @@
         optimizer.apply_gradients(zip(grads, model_params))
 ```
 
+**마법의 한 줄**
+```python
+tf.debugging.set_log_device_placement(True)
+```
+
 > 오늘의 과제
 > ~~TF는 bn 과 dropout을 어떻게 관리하지?~~
 >
