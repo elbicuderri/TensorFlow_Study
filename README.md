@@ -17,7 +17,7 @@ model.batchorm.trainable = False
 ## 훈련 중 val_loss 체크를 할때 어떻게 되는 걸까..
 ## 은제 확인하냐
 ```
-> like thie
+> like thi
 ```python
         self.trainable = True
         self.batchnorm = tf.keras.layers.BatchNormalization(trainable=self.trainable)
