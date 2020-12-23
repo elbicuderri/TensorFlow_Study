@@ -1,6 +1,6 @@
 # TensorFlow_Study
 
-**외우자 이 다섯줄**
+### 외우자 이 다섯줄
 ```python
     for i, (img, label) in enumerate(train_loader):
         model_params = model.trainable_variables
@@ -11,11 +11,11 @@
         optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
-**마법의 한 줄**
+### 마법의 한 줄
 ```python
 tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
 ```
-
+>
 > 오늘의 과제
 > ~~TF는 bn 과 dropout을 어떻게 관리하지?~~
 >
@@ -53,10 +53,8 @@ If the value of the trainable attribute is changed after calling compile() on a 
 Reference:
 Ioffe and Szegedy, 2015.
 
-
+### tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
 ```python
-# tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
-
 dataset = tf.data.Dataset.from_tensor_slices((x_data, y_data))
 
 data_loader = dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32, drop_remainder=False)
@@ -78,20 +76,30 @@ for (x_batch, y_batch) in data_loader:
     ...
 ```
 
+### torch 의 nn.Sequential 처럼 tf에서 block를 쌓는 방법..
 ```python
 class Model(tf.keras.Model):
     def __init__(self):
         super().__init__()
     
         self.block = tf.keras.models.Sequential([ ... ]) # 이런 식으론 되지 않았다. 생각중.
+        self.block = tf.keras.Model.Sequential([ ... ]) # 이것도 안되네요.. 그냥 함수로 짜야되나보네요..?
 ```
 
+### concatenate
 ```python
 out = concatenate([in1, in2])
 out = in1 + in2 # in1, in2 가 tf.Tensor 일 경우
 ```
 
-**einsum is all you need**
+### model.summary()
+>
+> subclassing API 방식 model을 만들면 model.summary() 가 안된다.
+> 
+> 대충 방법은 알 거 같은데 귀찮다..
+>
+
+### einsum is all you need
 > tensorflow도 einsum을 지원한다. numpy도 지원한다. 앞으로 연산할때 shape 생각하기 쉬워질듯
 >
 
