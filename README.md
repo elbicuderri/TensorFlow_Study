@@ -1,8 +1,9 @@
 # TensorFlow_Study
 
 > 오늘의 과제
-> TF는 bn 과 dropout을 어떻게 관리하지?
+> ~~TF는 bn 과 dropout을 어떻게 관리하지?~~
 >
+> 해결 완료
 >
 ```python
 self.batchnorm = BatchNormalization(trainable=True)
@@ -16,7 +17,23 @@ model.batchorm.trainable = False
 ## 훈련 중 val_loss 체크를 할때 어떻게 되는 걸까..
 ## 은제 확인하냐
 ```
-The meaning of setting layer.trainable = False is to freeze the layer, i.e. its internal state will not change during training: its trainable weights will not be updated during fit() or train_on_batch(), and its state updates will not be run.
+> like thie
+```python
+        self.trainable = True
+        self.batchnorm = tf.keras.layers.BatchNormalization(trainable=self.trainable)
+        self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.trainable) 
+        
+        for epoch in range(epochs):
+            for i, (img, label) in enumerate(train_loader):
+                model.trainable = True
+                model_params = model.trainable_variables
+
+            for j, (val_img, val_label) in enumerate(valid_loader):
+                model.trainable = False            
+# 아마도 해결? @, @...
+```
+The meaning of setting layer.trainable = False is to freeze the layer, 
+i.e. its internal state will not change during training: its trainable weights will not be updated during fit() or train_on_batch(), and its state updates will not be run.
 
 Usually, this does not necessarily mean that the layer is run in inference mode (which is normally controlled by the training argument that can be passed when calling a layer). "Frozen state" and "inference mode" are two separate concepts.
 
