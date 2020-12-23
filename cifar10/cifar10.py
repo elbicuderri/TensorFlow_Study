@@ -11,28 +11,21 @@ tf.debugging.set_log_device_placement(True)
 
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
 
-# x_train = x_train.reshape(x_train.shape[0], 32, 32, 3)
-
-# x_test = x_test.reshape(x_test.shape[0], 32, 32, 3)
-
-# x_train, x_test = x_train / np.float32(255.0), x_test / np.float32(255.0)
-
-# y_train = to_categorical(y_train)
-
-# print(y_train.shape)
-
-# y_test = to_categorical(y_test)
-
 train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
 
+valid_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+
 def preprocess(x, y):
-    x = tf.reshape(x, [32, 32, 3])
-    image = tf.cast(x, tf.float32) / 255.0
+    image = tf.reshape(x, [32, 32, 3])
+    image = tf.cast(image, tf.float32) / 255.0
+    image = (image - 127.5) / 127.5
     label = tf.one_hot(y, depth=10)
     label = tf.squeeze(label)
     return image, label
 
 train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32)
+
+valid_loader = valid_dataset.map(preprocess).repeat(3).batch(32)
 
 # train_loader = train_dataset.batch(32)
 
@@ -55,9 +48,11 @@ class SimpleResNet(tf.keras.Model):
         #     tf.keras.layers.BatchNormalization(),
         #     tf.keras.layers.Activation('relu')
         # ])
+        
+        self.trainable = True
 
         self.conv = tf.keras.layers.Conv2D(filters=16, kernel_size=3, padding='same', strides=1, use_bias=False)
-        self.batchnorm = tf.keras.layers.BatchNormalization(trainable=True)
+        self.batchnorm = tf.keras.layers.BatchNormalization(trainable=self.trainable)
         self.relu = tf.keras.layers.Activation('relu')
     
         self.avg_pool = tf.keras.layers.AveragePooling2D(pool_size=(8, 8))
@@ -84,42 +79,59 @@ loss_fn = tf.keras.losses.CategoricalCrossentropy()
 optimizer = tf.keras.optimizers.Adam(lr=1e-3)
 
 batch_size = 32
+epochs = 3
 
-# loss_dict = {}
+# train_step = len(train_loader)
+# valid_step = len(valid_loader)
+
+loss_dict = {}
+val_loss_dict = {}
 
 # with tf.device('/GPU:0'):
-for epoch in range(1, 4):
+for epoch in range(1, epochs + 1):
+    
     loss_list = []   
-
     for i, (img, label) in enumerate(train_loader):
+        model.trainable = True
         model_params = model.trainable_variables
 
         with tf.GradientTape() as tape:
             out = model(img)
             
-            # print(out.shape)
-            
-            # print(label.shape)
-
             loss = loss_fn(out, label)
 
-            # loss_list.append(loss.numpy().sum())
+            loss_list.append(loss.numpy().sum())
 
             # print(loss.numpy().sum())
 
         grads = tape.gradient(loss, model_params)
 
         optimizer.apply_gradients(zip(grads, model_params))
+    
+    loss_dict[epoch] = statistics.mean(loss_list)
+    print(f"[{epoch}/{epochs}] : {loss_dict[epoch]}")
+        
+    
+    val_loss_list = []
+    for j, (val_img, val_label) in enumerate(valid_loader):
+        model.trainable = False
+        
+        val_out = model(val_img)
+        
+        val_loss = loss_fn(val_out, val_label)
+        
+        val_loss_list.append(val_loss.numpy().sum())
 
-    # loss_dict[epoch] = statistics.mean(loss_list)
+        # print(val_loss.numpy().sum())
+        
+    val_loss_dict[epoch] = statistics.mean(val_loss_list)
+    print(f"[{epoch}/{epochs}] : {val_loss_dict[epoch]}")
 
-    # print(loss_dict[epoch])
-    print(f"[{epoch}/3] finished")
+    print(f"[{epoch}/{epochs}] finished")
     print('==================')
 
     # if (epoch == 5):
     #     model.save_weights('model/cifar10_model_5', save_format='tf')
-
 
 model.save_weights('model/cifar10_model', save_format='tf')
 
