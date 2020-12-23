@@ -67,7 +67,7 @@ def preprocess(x, y):
     x = tf.reshape(x, [32, 32, 3])
     image = tf.cast(x, tf.float32) / 255.0
     label = tf.one_hot(y, depth=10)
-    label = tf.squeeze(label) # [batch, 1, 10] -> [batch, 10]
+    label = tf.squeeze(label) # [1, 10] -> [10]
     return image, label
 ###
 #shuffle : dataset 길이만큼 shuffle, reshuffle_each_iteration=False 면 같은 shuffle 반복
