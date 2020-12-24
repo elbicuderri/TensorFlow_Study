@@ -4,8 +4,9 @@
 ```python
     for i, (img, label) in enumerate(train_loader):
         model_params = model.trainable_variables
-        with tf.GradientTape() as tape: # torch 는 forward를 하면 자동으로 jacobian matrix 을 생성해 autograd 준비 
+        with tf.GradientTape() as tape: # torch는 forward를 하면 jacobian matrix을 생성 후 autograd 준비 
             out = model(img)            # tf 는 tape라는 것으로 감싸놓는 느낌적인 느낌으로 생각하면 된다
+                                        # tf 도 jacobian matrix를 사용한다.
             loss = loss_fn(out, label)
         grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
         optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
@@ -34,7 +35,7 @@ tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보
 
             for j, (val_img, val_label) in enumerate(valid_loader):
                 model.trainable = False            
-# 아마도 해결? @, @...
+# 아마도 해결? @, @... 아니다 dropout은 확인필요...
 ```
 The meaning of setting layer.trainable = False is to freeze the layer, 
 i.e. its internal state will not change during training: its trainable weights will not be updated during fit() or train_on_batch(), and its state updates will not be run.
@@ -83,7 +84,7 @@ class Model(tf.keras.Model):
         super().__init__()
     
         self.block = tf.keras.models.Sequential([ ... ]) # 이런 식으론 되지 않았다. 생각중.
-        self.block = tf.keras.Model.Sequential([ ... ]) # 이것도 안되네요.. 그냥 함수로 짜야되나보네요..?
+        self.block = tf.keras.Model.Sequential([ ... ]) # 이것도 안되네요.. 그냥 함수로 짜야되나보네요..? 귀찮..
 ```
 
 ### concatenate
@@ -100,6 +101,7 @@ out = in1 + in2 # in1, in2 가 tf.Tensor 일 경우
 >
 
 ### einsum is all you need
+>
 > tensorflow도 einsum을 지원한다. numpy도 지원한다. 앞으로 연산할때 shape 생각하기 쉬워질듯
 >
 
