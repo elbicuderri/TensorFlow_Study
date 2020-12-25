@@ -2,14 +2,14 @@
 
 ### 외우자 이 다섯줄
 ```python
-    for i, (img, label) in enumerate(train_loader):
-        model_params = model.trainable_variables
-        with tf.GradientTape() as tape: # torch는 forward하면 jacobian matrix를 생성 후 autograd 준비 
-            out = model(img)            # tf 는 tape라는 것으로 감싸놓는 느낌적인 느낌으로 생각하면 된다
-                                        # tf 도 jacobian matrix를 사용한다.
-            loss = loss_fn(out, label)
-        grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
-        optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
+for i, (img, label) in enumerate(train_loader):
+    model_params = model.trainable_variables
+    with tf.GradientTape() as tape: # torch는 forward하면 jacobian matrix를 생성 후 autograd 준비 
+        out = model(img)            # tf 는 tape라는 것으로 감싸놓는 느낌적인 느낌으로 생각하면 된다
+                                    # tf 도 jacobian matrix를 사용한다.
+        loss = loss_fn(out, label)
+    grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
+    optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
 ### 마법의 한 줄
@@ -24,17 +24,17 @@ tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보
 >
 > like this
 ```python
-        self.trainable = True
-        self.batchnorm = tf.keras.layers.BatchNormalization(trainable=self.trainable)
-        self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.trainable) 
-        
-        for epoch in range(epochs):
-            for i, (img, label) in enumerate(train_loader):
-                model.trainable = True
-                model_params = model.trainable_variables
+self.trainable = True
+self.batchnorm = tf.keras.layers.BatchNormalization(trainable=self.trainable)
+self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.trainable) 
 
-            for j, (val_img, val_label) in enumerate(valid_loader):
-                model.trainable = False            
+for epoch in range(epochs):
+    for i, (img, label) in enumerate(train_loader):
+        model.trainable = True
+        model_params = model.trainable_variables
+
+    for j, (val_img, val_label) in enumerate(valid_loader):
+        model.trainable = False            
 # 아마도 해결? @, @... 아니다 dropout은 확인필요...
 # 핸즈온 머신러닝 2판 p494 "가장 중요한 것은 이 훈련 반복이 훈련과 테스트 시에 
 # 다르게 동작하는 층(예를 들면 BatchNormalizatation이나 Dropout)을 
