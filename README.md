@@ -17,7 +17,7 @@ for i, (img, label) in enumerate(train_loader):
 tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
 ```
 
-### TF는 bn 과 dropout을 어떻게 관리하지?
+### TF는 bn 과 dropout을 어떻게 관리하지?(custom train일 때...)
 >
 > like this... 아마도?
 >
