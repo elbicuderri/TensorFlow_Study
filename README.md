@@ -5,7 +5,7 @@
 for i, (img, label) in enumerate(train_loader):
     model_params = model.trainable_variables
     with tf.GradientTape() as tape: # torch는 forward하면 jacobian matrix를 생성 후 autograd
-        out = model(img)            # tf 는 tape라는 것으로 감싸놓는 느낌적인 느낌으로 생각하면 된다
+        out = model(img)            # tf 는 tape라는 것으로 감싸놓는 느낌으로 생각하면 된다
                                     # tf 도 jacobian matrix를 사용한다.
         loss = loss_fn(out, label)
     grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
