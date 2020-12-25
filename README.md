@@ -4,7 +4,7 @@
 ```python
     for i, (img, label) in enumerate(train_loader):
         model_params = model.trainable_variables
-        with tf.GradientTape() as tape: # torch는 forward를 하면 jacobian matrix을 생성 후 autograd 준비 
+        with tf.GradientTape() as tape: # torch는 forward하면 jacobian matrix를 생성 후 autograd 준비 
             out = model(img)            # tf 는 tape라는 것으로 감싸놓는 느낌적인 느낌으로 생각하면 된다
                                         # tf 도 jacobian matrix를 사용한다.
             loss = loss_fn(out, label)
@@ -36,6 +36,10 @@ tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보
             for j, (val_img, val_label) in enumerate(valid_loader):
                 model.trainable = False            
 # 아마도 해결? @, @... 아니다 dropout은 확인필요...
+# 핸즈온 머신러닝 2판 p494 "가장 중요한 것은 이 훈련 반복이 훈련과 테스트 시에 
+# 다르게 동작하는 층(예를 들면 BatchNormalizatation이나 Dropout)을 
+# 다루지 못한다는 점입니다. 이를 처리하려면 training=True로 모델을 호출하여 
+# 필요한 모든 층에 이 매개변수가 전파되도록 해야 합니다."
 ```
 The meaning of setting layer.trainable = False is to freeze the layer, 
 i.e. its internal state will not change during training: its trainable weights will not be updated during fit() or train_on_batch(), and its state updates will not be run.
