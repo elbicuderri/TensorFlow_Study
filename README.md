@@ -22,18 +22,17 @@ tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보
 > like this... 아마도?
 >
 ```python
-self.trainable = True
-self.batchnorm = tf.keras.layers.BatchNormalization(trainable=self.trainable)
-self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.trainable) 
+self.training = True
+self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.training) 
 
 for epoch in range(epochs):
     for i, (img, label) in enumerate(train_loader):
-        model.trainable = True
+        model.training = True
         model_params = model.trainable_variables
 
     for j, (val_img, val_label) in enumerate(valid_loader):
-        model.trainable = False            
-# 아마도 해결? @, @... 확인필요... mean,var,dropout layer debugging..
+        model.training = False            
+# 아마도 해결? batchnorm은 따로 할 필요 없고 dropout만 train, infer시 바꾸면 된다.
 # 핸즈온 머신러닝 2판 p494 "가장 중요한 것은 이 훈련 반복이 훈련과 테스트 시에 
 # 다르게 동작하는 층(예를 들면 BatchNormalizatation이나 Dropout)을 
 # 다루지 못한다는 점입니다. 이를 처리하려면 training=True로 모델을 호출하여 
@@ -87,6 +86,16 @@ class Model(tf.keras.Model):
     
         self.block = tf.keras.models.Sequential([ ... ]) # 이런 식으론 되지 않았다. 생각중.
         self.block = tf.keras.Model.Sequential([ ... ]) # 이것도 안되네요.. 그냥 함수로 짜야되나보네요..? 귀찮..
+
+
+class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨.
+    def __init__(self):
+        super(Block, self).__init__()
+        
+    def call(self, x)
+        
+        return out
+
 ```
 
 ### concatenate
@@ -101,6 +110,18 @@ out = in1 + in2 # in1, in2 가 tf.Tensor 일 경우
 > 
 > 대충 방법은 알 거 같은데 귀찮다..
 >
+```python
+    def model(self):
+        inputs = tf.keras.Input(shape=(32, 32, 3))
+        outputs = self.call(inputs)
+        return tf.keras.Model(inputs=inputs, outputs=outputs)
+
+model = Model()
+
+model.model().summary() 
+# 해결완료. block으로 쌓인 부분 안 보임. 더 좋은 방법 찾아봅시다.
+```
+
 
 ### einsum is all you need
 >
@@ -134,4 +155,16 @@ y2 = tf.einsum("nhwc, hwck-> nk", b, w2.numpy().reshape([228, 228, 3, 10])) #Ten
 print(y1.shape)
 
 print(y2.shape)
+```
+
+
+### tf의 data_format의 확인 하는 법
+```python
+import tensorflow.keras.backend as K
+# default : channels_last
+print(K.image_data_format())
+K.set_image_data_format('channels_first')
+print(K.image_data_format())
+K.set_image_data_format('channels_last')
+print(K.image_data_format())
 ```
