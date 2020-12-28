@@ -82,7 +82,7 @@ loss_fn = tf.keras.losses.CategoricalCrossentropy()
 optimizer = tf.keras.optimizers.Adam(lr=1e-3)
 
 batch_size = 32
-epochs = 1
+epochs = 3
 
 # train_step = len(train_loader)
 # valid_step = len(valid_loader)
@@ -96,10 +96,14 @@ for epoch in range(1, epochs + 1):
     loss_list = []   
     for i, (img, label) in enumerate(train_loader):
         model.trainable = True
-        print(model.batchnorm.moving_mean.trainable)
+        # print(model.batchnorm.moving_mean)
+        # print(model.batchnorm.moving_mean.trainable)
+
+        # print(model.batchnorm.moving_variance)
+        # print(model.batchnorm.moving_variance.trainable)
+
         model_params = model.trainable_variables
-        if (i == 0):
-            print(model_params)
+
 
         with tf.GradientTape() as tape:
             out = model(img)
@@ -108,11 +112,24 @@ for epoch in range(1, epochs + 1):
 
             loss_list.append(loss.numpy().sum())
 
+            if (i == 0):
+                print(model_params)
+
             # print(loss.numpy().sum())
+
+        print(tape)
 
         grads = tape.gradient(loss, model_params)
 
+        print(tape)
+
+        if (i == 0):
+            print(model_params)
+
         optimizer.apply_gradients(zip(grads, model_params))
+
+        if (i == 0):
+            print(model_params)
     
     loss_dict[epoch] = statistics.mean(loss_list)
     print(f"[{epoch}/{epochs}] : {loss_dict[epoch]}")
@@ -121,12 +138,21 @@ for epoch in range(1, epochs + 1):
     val_loss_list = []
     for j, (val_img, val_label) in enumerate(valid_loader):
         model.trainable = False
+        # print(model.batchnorm.moving_mean)
+        # print(model.batchnorm.moving_mean.trainable)
+
+        # print(model.batchnorm.moving_variance)
+        # print(model.batchnorm.moving_variance.trainable)
+
+        val_out = model(val_img)
+
         if (j == 0):
             print(model.trainable_variables)
         
-        val_out = model(val_img)
-        
         val_loss = loss_fn(val_out, val_label)
+
+        if (j == 0):
+            print(model.trainable_variables)
         
         val_loss_list.append(val_loss.numpy().sum())
 
