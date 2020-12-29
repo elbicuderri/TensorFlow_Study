@@ -101,7 +101,6 @@ class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨.
 ### concatenate
 ```python
 out = concatenate([in1, in2])
-out = in1 + in2 # in1, in2 가 tf.Tensor 일 경우
 ```
 
 ### model.summary()
