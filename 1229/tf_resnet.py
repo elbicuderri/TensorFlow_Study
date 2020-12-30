@@ -120,16 +120,18 @@ def preprocess(x, y):
 
     return image, label
 
-train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32)
+batch_size = 32
+epochs = 5
 
-valid_loader = valid_dataset.map(preprocess).repeat(3).batch(32)
+train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(epochs).batch(batch_size)
+
+valid_loader = valid_dataset.map(preprocess).repeat(epochs).batch(batch_size)
 
 # for img, lbl in train_loader.take(1):
 #     print(img.shape)
 #     print(lbl.shape)
 
-batch_size = 32
-epochs = 5
+
 train_step = len(train_loader)
 val_step = len(valid_loader)
 
