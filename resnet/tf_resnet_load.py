@@ -1,6 +1,8 @@
 import tensorflow as tf
+
 from tensorflow.python.client import device_lib
 from tensorflow.keras.layers import *
+from tensorflow.keras.utils import to_categorical
 from statistics import mean
 
 print(device_lib.list_local_devices())
@@ -98,87 +100,44 @@ class SimpleResNet(tf.keras.Model):
 
 model = SimpleResNet()
 
-model.model().summary()
-
-loss_fn = tf.keras.losses.CategoricalCrossentropy()
-
-optimizer = tf.keras.optimizers.Adam(lr=1e-3)
-
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
 
-train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+x_test = x_test.reshape(x_test.shape[0], 32, 32, 3).astype("float32")
+x_test = x_test / 255.0
+x_test = (x_test - 0.5) / 0.5
+# y_test = to_categorical(y_test)
 
-valid_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+test_data = x_test[:32, :, :, :]
 
-def preprocess(x, y):
-    image = tf.reshape(x, [32, 32, 3])
-    image = tf.cast(image, tf.float32) / 255.0
-    image = (image - 0.5) / 0.5
+out = model(test_data)
 
-    label = tf.one_hot(y, depth=10)
-    label = tf.squeeze(label)
+print(out.shape)
 
-    return image, label
+checkpoint_dir = "model/"
 
-batch_size = 32
-epochs = 5
+latest = tf.train.latest_checkpoint(checkpoint_dir)
+print(latest)
 
-# train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(epochs).batch(batch_size)
-train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).batch(batch_size)
+model.load_weights(latest)
 
-# valid_loader = valid_dataset.map(preprocess).repeat(epochs).batch(batch_size)
-valid_loader = valid_dataset.map(preprocess).batch(batch_size)
+weights = model.get_weights()
+
+# print(weights)
+
+print(dir(model))
+
+# print(model.get_layer[0])
+
+# print(model.get_input_at())
+
+# print(model.input_shape())
+
+print(model.trainable_variables)
+
+print(len(model.trainable_variables))
+
+print(len(model.trainable_weights))
+
+## something is wrong....
 
 
-# for img, lbl in train_loader.take(1):
-#     print(img.shape)
-#     print(lbl.shape)
-
-
-# train_step = len(train_loader)
-train_step = (60000 // 32) + 1
-# val_step = len(valid_loader)
-val_step = (10000 // 32) + 1
-
-loss_dict = {}
-val_loss_dict = {}
-
-for epoch in range(1, epochs + 1):
-
-    loss_list = []   
-    for train_step_idx, (img, label) in enumerate(train_loader):
-        model_params = model.trainable_variables
-        
-        print(len(model_params))
-
-        with tf.GradientTape() as tape:
-            out = model(img)
-            loss = loss_fn(out, label)
-            loss_list.append(loss.numpy().sum())
-
-        grads = tape.gradient(loss, model_params)
-        optimizer.apply_gradients(zip(grads, model_params))
-
-        if ((train_step_idx+1) % 100 == 0):
-            print(f"Epoch [{epoch}/{epochs}] Step [{train_step_idx + 1}/{train_step}] Loss: {loss.numpy().sum():.4f}")
-    
-    loss_dict[epoch] = loss_list
-        
-    val_loss_list = []
-    for val_step_idx, (val_img, val_label) in enumerate(valid_loader):
-
-        val_out = model(val_img)        
-        val_loss = loss_fn(val_out, val_label)        
-        val_loss_list.append(val_loss.numpy().sum())
-        
-    val_loss_dict[epoch] = val_loss_list
-
-    print(f"Epoch [{epoch}] Train Loss: {mean(loss_dict[epoch]):.4f} Val Loss: {mean(val_loss_dict[epoch]):.4f}")
-    print("========================================================================================")
-
-    # if (epoch % 5 == 1):
-    model.save_weights(f'checkpoint/cifar10_model_epoch_{epoch}.ckpt', save_format='tf')
-
-model.save_weights('model/cifar10_model', save_format='tf')
-
-print('model saved')

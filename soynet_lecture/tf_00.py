@@ -1,5 +1,10 @@
 import tensorflow as tf
 from tensorflow.keras.layers import *
+from tensorflow.python.client import device_lib
+
+print(device_lib.list_local_devices())
+
+tf.debugging.set_log_device_placement(True)
 
 class SimpleModel(tf.keras.Model):
     def __init__(self):
@@ -15,7 +20,7 @@ class SimpleModel(tf.keras.Model):
 
     def call(self, x):
         out0 = self.conv(x)
-        print(out0) # debugging
+        # print(out0) # debugging
         out1 = self.batchnorm(out0)
         out2 = self.relu(out1)
         out3 = self.avg_pool(out2)
@@ -71,18 +76,3 @@ for epoch in range(1, epochs + 1):
 model.save_weights('cifar10_model', save_format='tf')
 
 print('model saved')
-
-
-
-
-
-
-
-
-
-
-
-
-# from tensorflow.python.client import device_lib
-# print(device_lib.list_local_devices())
-# # tf.debugging.set_log_device_placement(True)
