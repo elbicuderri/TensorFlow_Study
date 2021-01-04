@@ -55,9 +55,12 @@ def preprocess(x, y):
 
     return image, label
 
-train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32)
+# train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32)
+train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).batch(32)
 
-valid_loader = valid_dataset.map(preprocess).repeat(3).batch(32)
+# valid_loader = valid_dataset.map(preprocess).repeat(3).batch(32)
+valid_loader = valid_dataset.map(preprocess).batch(32)
+
 
 for epoch in range(1, epochs + 1): 
     for img, label in train_loader:
