@@ -60,7 +60,7 @@ class ResidualBlock(tf.keras.layers.Layer):
         out5 = self.relu(out4)
         
         return out5
-        
+
 
 class SimpleResNet(tf.keras.Model):
     def __init__(self):
@@ -69,6 +69,14 @@ class SimpleResNet(tf.keras.Model):
         self.conv0 = conv33(filters=16, kernel_size=3, padding='same', strides=1, use_bias=False)
         self.batchnorm = BatchNormalization()
         self.relu = Activation('relu')
+
+        self.block11 = ResidualBlock(16, 3, 'same', downsample=False)
+        self.block12 = ResidualBlock(16, 3, 'same', downsample=False)
+        self.block21 = ResidualBlock(32, 3, 'same', downsample=True)
+        self.block22 = ResidualBlock(32, 3, 'same', downsample=False)
+        self.block31 = ResidualBlock(64, 3, 'same', downsample=True)
+        self.block32 = ResidualBlock(64, 3, 'same', downsample=False)       
+        
         self.avg_pool = AveragePooling2D(pool_size=(8, 8))
         self.flatten = Flatten()
         self.fc = Dense(10)
@@ -78,13 +86,20 @@ class SimpleResNet(tf.keras.Model):
         out0 = self.conv0(x)
         out0 = self.batchnorm(out0)
         out0 = self.relu(out0)
-
-        out11 = ResidualBlock(16, 3, 'same', downsample=False)(out0)
-        out12 = ResidualBlock(16, 3, 'same', downsample=False)(out11)
-        out21 = ResidualBlock(32, 3, 'same', downsample=True)(out12)
-        out22 = ResidualBlock(32, 3, 'same', downsample=False)(out21)
-        out31 = ResidualBlock(64, 3, 'same', downsample=True)(out22)
-        out32 = ResidualBlock(64, 3, 'same', downsample=False)(out31)
+        
+        out11 = self.block11(out0)
+        out12 = self.block12(out11)
+        out21 = self.block21(out12)
+        out22 = self.block22(out21)
+        out31 = self.block31(out22)
+        out32 = self.block32(out31)
+        
+        # out11 = ResidualBlock(16, 3, 'same', downsample=False)(out0)
+        # out12 = ResidualBlock(16, 3, 'same', downsample=False)(out11)
+        # out21 = ResidualBlock(32, 3, 'same', downsample=True)(out12)
+        # out22 = ResidualBlock(32, 3, 'same', downsample=False)(out21)
+        # out31 = ResidualBlock(64, 3, 'same', downsample=True)(out22)
+        # out32 = ResidualBlock(64, 3, 'same', downsample=False)(out31)
 
         out4 = self.avg_pool(out32)
         out5 = self.flatten(out4)
@@ -99,45 +114,69 @@ class SimpleResNet(tf.keras.Model):
         return tf.keras.Model(inputs=inputs, outputs=outputs)
 
 model = SimpleResNet()
+latest_model = SimpleResNet()
 
-(x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
-
-x_test = x_test.reshape(x_test.shape[0], 32, 32, 3).astype("float32")
-x_test = x_test / 255.0
-x_test = (x_test - 0.5) / 0.5
-# y_test = to_categorical(y_test)
-
-test_data = x_test[:32, :, :, :]
+test_data = tf.random.uniform([32, 32, 32, 3]) ## to create a model object
 
 out = model(test_data)
+out2 = latest_model(test_data)
 
 print(out.shape)
+print(out2.shape)
 
-checkpoint_dir = "model/"
+##=====================================================================
+
+ckpt_dir = "checkpoint/cifar10_model_epoch_1.ckpt"
+
+model.load_weights(ckpt_dir) ## epoch 1 model
+
+##=====================================================================
+
+checkpoint_dir = "checkpoint/"
 
 latest = tf.train.latest_checkpoint(checkpoint_dir)
+
 print(latest)
 
-model.load_weights(latest)
+latest_model.load_weights(latest) ## epoch 5 model
+
+##=====================================================================
+
+# print(dir(model))
+
+layers = model.layers
+
+# print(layers)
+
+latest_layers = latest_model.layers
+
+# print(latest_layers)
 
 weights = model.get_weights()
 
+for w in weights:
+    # print(type(w))
+    # print(w)
+    print(w.shape)
+
+print('=====================================================================')
+latest_weights = latest_model.get_weights()
+
+for w in latest_weights:
+    # print(type(w))
+    # print(w)
+    print(w.shape)
+    
 # print(weights)
 
-print(dir(model))
+# print(len(model.non_trainable_variables))
 
-# print(model.get_layer[0])
+# print(len(model.non_trainable_weights))
 
-# print(model.get_input_at())
+# print(len(model.trainable_variables))
 
-# print(model.input_shape())
+# print(len(model.trainable_weights))
 
-print(model.trainable_variables)
-
-print(len(model.trainable_variables))
-
-print(len(model.trainable_weights))
-
-## something is wrong....
+## something is wrong.... solved..?
 
 

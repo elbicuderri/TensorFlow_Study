@@ -8,6 +8,6 @@ print(x)
 
 print(y)
 
-x = x.numpy().reshape(-1)
+x = x.numpy().reshape(-1) # add numpy()
 
 print(x)

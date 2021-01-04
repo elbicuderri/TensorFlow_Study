@@ -18,7 +18,7 @@ valid_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
 def preprocess(x, y):
     image = tf.reshape(x, [32, 32, 3])
     image = tf.cast(image, tf.float32) / 255.0
-    image = (image - 127.5) / 127.5
+    image = (image - 0.5) / 0.5
     label = tf.one_hot(y, depth=10)
     label = tf.squeeze(label)
     return image, label

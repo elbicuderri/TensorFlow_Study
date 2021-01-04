@@ -1,11 +1,12 @@
 import tensorflow as tf 
+from tensorflow.keras.layers import *
 
 class MoblieNetV1(tf.keras.Model):
     def __init__(self, in_channels, n_classes):
         super(MoblieNetV1, self).__init__()
         
         def depthwise_seperable_conv(x):
-            out = DepthwiseConv2D()(out)
+            out = DepthwiseConv2D()(x)
             out = BatchNormalization()(out)
             out = Activation('relu')(out)
             
@@ -17,4 +18,4 @@ class MoblieNetV1(tf.keras.Model):
         
     def call(self, x):
         out = depthwise_seperable_conv(x)
-        
+        return out

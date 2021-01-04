@@ -12,6 +12,20 @@ for i, (img, label) in enumerate(train_loader):
     optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
+### load_weights()
+
+```python
+    checkpoint_path = "checkpoint/model_epoch_1.ckpt"
+
+    model.load_weights(checkpoint_path) ## epoch 1 model
+
+    checkpoint_dir = "checkpoint/"
+
+    latest = tf.train.latest_checkpoint(checkpoint_dir)
+
+    latest_model.load_weights(latest) 
+```
+
 ### 마법의 한 줄
 ```python
 tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
