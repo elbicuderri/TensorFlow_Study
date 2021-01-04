@@ -36,17 +36,22 @@ tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보
 > like this... 아마도?
 >
 ```python
+self.trainable = True
 self.training = True
-self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.training) 
+self.batchnorm = BatchNormalization(trainable=self.trainable)
+self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.training)
 
 for epoch in range(epochs):
     for i, (img, label) in enumerate(train_loader):
+        model.trainable = True
         model.training = True
         model_params = model.trainable_variables
 
     for j, (val_img, val_label) in enumerate(valid_loader):
+        model.trainable = False
         model.training = False            
 # 아마도 해결? batchnorm은 따로 할 필요 없고 dropout만 train, infer시 바꾸면 된다.
+# 아니다 model.trainable = False 설정해야 한다. resnet/tf_resnet_updated.py 참고
 # 핸즈온 머신러닝 2판 p494 "가장 중요한 것은 이 훈련 반복이 훈련과 테스트 시에 
 # 다르게 동작하는 층(예를 들면 BatchNormalizatation이나 Dropout)을 
 # 다루지 못한다는 점입니다. 이를 처리하려면 training=True로 모델을 호출하여 
