@@ -7,14 +7,12 @@ print(device_lib.list_local_devices())
 
 # tf.debugging.set_log_device_placement(True)
 
-
 def conv33(filters, kernel_size=3, strides=1, padding='same', use_bias=False):
     return tf.keras.layers.Conv2D(
         filters=filters, kernel_size=kernel_size, strides=strides,
         padding=padding, use_bias=use_bias
     )
-
-  
+    
 class ResidualBlock(tf.keras.layers.Layer):
     def __init__(self, out_channels, kernel_size=3, padding='same', downsample=True, use_bias=False):
         super(ResidualBlock, self).__init__()
@@ -60,8 +58,7 @@ class ResidualBlock(tf.keras.layers.Layer):
         out5 = self.relu(out4)
         
         return out5
-  
-      
+        
 class SimpleResNet(tf.keras.Model):
     def __init__(self):
         super(SimpleResNet, self).__init__()
@@ -113,7 +110,6 @@ class SimpleResNet(tf.keras.Model):
         outputs = self.call(inputs)
         return tf.keras.Model(inputs=inputs, outputs=outputs)
 
-
 model = SimpleResNet()
 
 model.model().summary()
@@ -138,7 +134,6 @@ def preprocess(x, y):
 
     return image, label
 
-
 batch_size = 32
 epochs = 5
 
@@ -162,7 +157,6 @@ val_step = len(valid_loader)
 loss_dict = {}
 val_loss_dict = {}
 
-
 for epoch in range(1, epochs + 1):
 
     loss_list = []   
@@ -181,7 +175,7 @@ for epoch in range(1, epochs + 1):
             print(f"Epoch [{epoch}/{epochs}] Step [{train_step_idx + 1}/{train_step}] Loss: {loss.numpy().sum():.4f}")
     
     loss_dict[epoch] = loss_list
-        
+     
     val_loss_list = []
     for val_step_idx, (val_img, val_label) in enumerate(valid_loader):
 
@@ -190,7 +184,7 @@ for epoch in range(1, epochs + 1):
         val_loss_list.append(val_loss.numpy().sum())
         
     val_loss_dict[epoch] = val_loss_list
-
+    
     print(f"Epoch [{epoch}] Train Loss: {mean(loss_dict[epoch]):.4f} Val Loss: {mean(val_loss_dict[epoch]):.4f}")
     print("========================================================================================")
 
