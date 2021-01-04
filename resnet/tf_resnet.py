@@ -39,7 +39,7 @@ class ResidualBlock(tf.keras.layers.Layer):
                             padding=padding,
                             use_bias=use_bias)
         
-        self.batchnorm = BatchNormalization()
+        self.batchnorm = BatchNormalization(trainable=True)
         self.relu = Activation('relu')
         
     def call(self, x):
@@ -64,7 +64,7 @@ class SimpleResNet(tf.keras.Model):
         super(SimpleResNet, self).__init__()
     
         self.conv0 = conv33(filters=16, kernel_size=3, padding='same', strides=1, use_bias=False)
-        self.batchnorm = BatchNormalization()
+        self.batchnorm = BatchNormalization(trainable=True)
         self.relu = Activation('relu')
         
         self.block11 = ResidualBlock(16, 3, 'same', downsample=False)

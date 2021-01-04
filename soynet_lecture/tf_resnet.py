@@ -7,12 +7,14 @@ print(device_lib.list_local_devices())
 
 # tf.debugging.set_log_device_placement(True)
 
+
 def conv33(filters, kernel_size=3, strides=1, padding='same', use_bias=False):
     return tf.keras.layers.Conv2D(
         filters=filters, kernel_size=kernel_size, strides=strides,
         padding=padding, use_bias=use_bias
     )
-    
+
+  
 class ResidualBlock(tf.keras.layers.Layer):
     def __init__(self, out_channels, kernel_size=3, padding='same', downsample=True, use_bias=False):
         super(ResidualBlock, self).__init__()
@@ -39,7 +41,7 @@ class ResidualBlock(tf.keras.layers.Layer):
                             padding=padding,
                             use_bias=use_bias)
         
-        self.batchnorm = BatchNormalization()
+        self.batchnorm = BatchNormalization(trainable=True)
         self.relu = Activation('relu')
         
     def call(self, x):
@@ -58,13 +60,14 @@ class ResidualBlock(tf.keras.layers.Layer):
         out5 = self.relu(out4)
         
         return out5
-        
+  
+      
 class SimpleResNet(tf.keras.Model):
     def __init__(self):
         super(SimpleResNet, self).__init__()
     
         self.conv0 = conv33(filters=16, kernel_size=3, padding='same', strides=1, use_bias=False)
-        self.batchnorm = BatchNormalization()
+        self.batchnorm = BatchNormalization(trainable=True)
         self.relu = Activation('relu')
         
         self.block11 = ResidualBlock(16, 3, 'same', downsample=False)
@@ -110,6 +113,7 @@ class SimpleResNet(tf.keras.Model):
         outputs = self.call(inputs)
         return tf.keras.Model(inputs=inputs, outputs=outputs)
 
+
 model = SimpleResNet()
 
 model.model().summary()
@@ -134,6 +138,7 @@ def preprocess(x, y):
 
     return image, label
 
+
 batch_size = 32
 epochs = 5
 
@@ -156,6 +161,7 @@ val_step = len(valid_loader)
 
 loss_dict = {}
 val_loss_dict = {}
+
 
 for epoch in range(1, epochs + 1):
 
