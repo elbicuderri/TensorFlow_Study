@@ -12,6 +12,14 @@ for i, (img, label) in enumerate(train_loader):
     optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
+### tf.data 사용법
+
+[Link 1](https://medium.com/trackin-datalabs/input-data-tf-data-%EC%9C%BC%EB%A1%9C-batch-%EB%A7%8C%EB%93%A4%EA%B8%B0-1c96f17c3696)
+
+[Link 2](https://stackoverflow.com/questions/55627995/keras2-imagedatagenerator-or-tensorflow-tf-data)
+
+[Link 3 - official](https://www.tensorflow.org/guide/data#preprocessing_data)
+
 ### load_weights()
 
 ```python
