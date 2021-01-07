@@ -1,6 +1,8 @@
 import tensorflow as tf
+
 from tensorflow.python.client import device_lib
 from tensorflow.keras.layers import *
+from tensorflow.keras.utils import to_categorical
 from statistics import mean
 
 print(device_lib.list_local_devices())
@@ -39,7 +41,7 @@ class ResidualBlock(tf.keras.layers.Layer):
                             padding=padding,
                             use_bias=use_bias)
         
-        self.batchnorm = BatchNormalization(trainable=True)
+        self.batchnorm = BatchNormalization()
         self.relu = Activation('relu')
         
     def call(self, x):
@@ -58,21 +60,22 @@ class ResidualBlock(tf.keras.layers.Layer):
         out5 = self.relu(out4)
         
         return out5
-        
+
+
 class SimpleResNet(tf.keras.Model):
     def __init__(self):
         super(SimpleResNet, self).__init__()
     
         self.conv0 = conv33(filters=16, kernel_size=3, padding='same', strides=1, use_bias=False)
-        self.batchnorm = BatchNormalization(trainable=True)
+        self.batchnorm = BatchNormalization()
         self.relu = Activation('relu')
-        
+
         self.block11 = ResidualBlock(16, 3, 'same', downsample=False)
         self.block12 = ResidualBlock(16, 3, 'same', downsample=False)
         self.block21 = ResidualBlock(32, 3, 'same', downsample=True)
         self.block22 = ResidualBlock(32, 3, 'same', downsample=False)
         self.block31 = ResidualBlock(64, 3, 'same', downsample=True)
-        self.block32 = ResidualBlock(64, 3, 'same', downsample=False)
+        self.block32 = ResidualBlock(64, 3, 'same', downsample=False)       
         
         self.avg_pool = AveragePooling2D(pool_size=(8, 8))
         self.flatten = Flatten()
@@ -83,13 +86,13 @@ class SimpleResNet(tf.keras.Model):
         out0 = self.conv0(x)
         out0 = self.batchnorm(out0)
         out0 = self.relu(out0)
-
+        
         out11 = self.block11(out0)
         out12 = self.block12(out11)
         out21 = self.block21(out12)
         out22 = self.block22(out21)
         out31 = self.block31(out22)
-        out32 = self.block32(out31) ## updated 
+        out32 = self.block32(out31)
         
         # out11 = ResidualBlock(16, 3, 'same', downsample=False)(out0)
         # out12 = ResidualBlock(16, 3, 'same', downsample=False)(out11)
@@ -111,85 +114,67 @@ class SimpleResNet(tf.keras.Model):
         return tf.keras.Model(inputs=inputs, outputs=outputs)
 
 model = SimpleResNet()
+latest_model = SimpleResNet()
 
-model.model().summary()
+test_data = tf.random.uniform([32, 32, 32, 3]) ## to create a model object
 
-loss_fn = tf.keras.losses.CategoricalCrossentropy()
+out = model(test_data)
+out2 = latest_model(test_data)
 
-optimizer = tf.keras.optimizers.Adam(lr=1e-3)
+print(out.shape)
+print(out2.shape)
 
-(x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+##=====================================================================
 
-train_dataset = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+ckpt_dir = "checkpoint/cifar10_model_epoch_1.ckpt"
 
-valid_dataset = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+model.load_weights(ckpt_dir) ## epoch 1 model
 
-def preprocess(x, y):
-    image = tf.reshape(x, [32, 32, 3])
-    image = tf.cast(image, tf.float32) / 255.0
-    image = (image - 0.5) / 0.5
+##=====================================================================
 
-    label = tf.one_hot(y, depth=10)
-    label = tf.squeeze(label)
+checkpoint_dir = "checkpoint/"
 
-    return image, label
+latest = tf.train.latest_checkpoint(checkpoint_dir)
 
-batch_size = 32
-epochs = 5
+print(latest)
 
-# train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(epochs).batch(batch_size)
-train_loader = train_dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).batch(batch_size)
+latest_model.load_weights(latest) ## epoch 5 model(latest)
 
-# valid_loader = valid_dataset.map(preprocess).repeat(epochs).batch(batch_size)
-valid_loader = valid_dataset.map(preprocess).batch(batch_size)
+##=====================================================================
 
-# for img, lbl in train_loader.take(1):
-#     print(img.shape)
-#     print(lbl.shape)
+# print(dir(model))
 
-train_step = len(train_loader)
-val_step = len(valid_loader)
+layers = model.layers
 
-# train_step = (60000 // 32) + 1
-# val_step = (10000 // 32) + 1
+# print(layers)
 
-loss_dict = {}
-val_loss_dict = {}
+latest_layers = latest_model.layers
 
-for epoch in range(1, epochs + 1):
+# print(latest_layers)
 
-    loss_list = []   
-    for train_step_idx, (img, label) in enumerate(train_loader):
-        model_params = model.trainable_variables
-        
-        with tf.GradientTape() as tape:
-            out = model(img)
-            loss = loss_fn(out, label)
-            loss_list.append(loss.numpy().sum())
+weights = model.get_weights()
 
-        grads = tape.gradient(loss, model_params)
-        optimizer.apply_gradients(zip(grads, model_params))
+for w in weights:
+    # print(type(w))
+    # print(w)
+    print(w.shape)
 
-        if ((train_step_idx+1) % 100 == 0):
-            print(f"Epoch [{epoch}/{epochs}] Step [{train_step_idx + 1}/{train_step}] Loss: {loss.numpy().sum():.4f}")
+print('=====================================================================')
+latest_weights = latest_model.get_weights()
+
+for w in latest_weights:
+    # print(type(w))
+    # print(w)
+    print(w.shape)
     
-    loss_dict[epoch] = loss_list
-     
-    val_loss_list = []
-    for val_step_idx, (val_img, val_label) in enumerate(valid_loader):
+# print(weights)
 
-        val_out = model(val_img)        
-        val_loss = loss_fn(val_out, val_label)        
-        val_loss_list.append(val_loss.numpy().sum())
-        
-    val_loss_dict[epoch] = val_loss_list
-    
-    print(f"Epoch [{epoch}] Train Loss: {mean(loss_dict[epoch]):.4f} Val Loss: {mean(val_loss_dict[epoch]):.4f}")
-    print("========================================================================================")
+# print(len(model.non_trainable_variables))
 
+# print(len(model.non_trainable_weights))
 
-    model.save_weights(f'checkpoint/cifar10_model_epoch_{epoch}.ckpt', save_format='tf')
+# print(len(model.trainable_variables))
 
-model.save_weights('model/cifar10_model', save_format='tf')
+# print(len(model.trainable_weights))
 
-print('model saved')
+# variables == weights
