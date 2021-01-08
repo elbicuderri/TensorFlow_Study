@@ -116,13 +116,8 @@ class SimpleResNet(tf.keras.Model):
 model = SimpleResNet()
 latest_model = SimpleResNet()
 
-test_data = tf.random.uniform([32, 32, 32, 3]) ## to create a model object
-
-out = model(test_data)
-out2 = latest_model(test_data)
-
-print(out.shape)
-print(out2.shape)
+model.model().summary()
+latest_model.model().summary()
 
 ##=====================================================================
 
@@ -141,40 +136,3 @@ print(latest)
 latest_model.load_weights(latest) ## epoch 5 model(latest)
 
 ##=====================================================================
-
-# print(dir(model))
-
-layers = model.layers
-
-# print(layers)
-
-latest_layers = latest_model.layers
-
-# print(latest_layers)
-
-weights = model.get_weights()
-
-for w in weights:
-    # print(type(w))
-    # print(w)
-    print(w.shape)
-
-print('=====================================================================')
-latest_weights = latest_model.get_weights()
-
-for w in latest_weights:
-    # print(type(w))
-    # print(w)
-    print(w.shape)
-    
-# print(weights)
-
-# print(len(model.non_trainable_variables))
-
-# print(len(model.non_trainable_weights))
-
-# print(len(model.trainable_variables))
-
-# print(len(model.trainable_weights))
-
-# variables == weights
