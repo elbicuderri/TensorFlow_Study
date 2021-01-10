@@ -1,12 +1,11 @@
 # TensorFlow_Study
 
-### 외우자 이 다섯줄
+### 외우자 이 일곱줄
 ```python
 for i, (img, label) in enumerate(train_loader):
     model_params = model.trainable_variables
     with tf.GradientTape() as tape: # torch는 forward하면 autograd
-        out = model(img)            # tf 는 tape에 기록하는 느낌으로 생각하면 된다
-                                    # tf 도 jacobian matrix를 사용한다.
+        out = model(img)            # tf 는 tape에 기록하는 느낌으로 생각하면 된다.
         loss = loss_fn(out, label)
     grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
     optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
