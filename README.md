@@ -4,7 +4,7 @@
 ```python
 for i, (img, label) in enumerate(train_loader):
     model_params = model.trainable_variables
-    with tf.GradientTape() as tape: # torch는 forward하면 autograd
+    with tf.GradientTape() as tape: # torch는 forward하면 tensor에 autograd 된다.
         out = model(img)            # tf 는 tape에 기록하는 느낌으로 생각하면 된다.
         loss = loss_fn(out, label)
     grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
