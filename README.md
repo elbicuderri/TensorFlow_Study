@@ -1,12 +1,11 @@
 # TensorFlow_Study
 
-### 외우자 이 다섯줄
+### 외우자 이 일곱줄
 ```python
 for i, (img, label) in enumerate(train_loader):
     model_params = model.trainable_variables
-    with tf.GradientTape() as tape: # torch는 forward하면 autograd
-        out = model(img)            # tf 는 tape에 기록하는 느낌으로 생각하면 된다
-                                    # tf 도 jacobian matrix를 사용한다.
+    with tf.GradientTape() as tape: # torch는 forward하면 tensor에 autograd 된다.
+        out = model(img)            # tf 는 tape에 기록하는 느낌으로 생각하면 된다.
         loss = loss_fn(out, label)
     grads = tape.gradient(loss, model_params)  # gradients 를 계산한다. loss.backward()
     optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
@@ -86,7 +85,7 @@ Ioffe and Szegedy, 2015.
 ```python
 dataset = tf.data.Dataset.from_tensor_slices((x_data, y_data))
 
-data_loader = dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).repeat(3).batch(32, drop_remainder=False)
+data_loader = dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=True).batch(32, drop_remainder=False)
 
 #map : 전처리함수(data 하나에 대한 preprocess 함수를 작성하면 된다)
 ### 예를 들면 이렇게
@@ -98,7 +97,6 @@ def preprocess(x, y):
     return image, label
 ###
 #shuffle : dataset 길이만큼 shuffle, reshuffle_each_iteration=False 면 같은 shuffle 반복
-#repeat : epoch만큼 반복된 dataset 생성
 #batch: drop_remainder=True 면 마지막 batch_size 보다 작은 data 버림
 
 for (x_batch, y_batch) in data_loader:
