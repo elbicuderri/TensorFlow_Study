@@ -11,6 +11,11 @@ for i, (img, label) in enumerate(train_loader):
     optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
+### tf static graph
+```python
+@tf.function
+```
+
 ### tf.data 사용법
 
 [Link 1](https://medium.com/trackin-datalabs/input-data-tf-data-%EC%9C%BC%EB%A1%9C-batch-%EB%A7%8C%EB%93%A4%EA%B8%B0-1c96f17c3696)
