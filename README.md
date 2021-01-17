@@ -11,6 +11,8 @@ for i, (img, label) in enumerate(train_loader):
     optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
+[tf.function 공부](https://www.tensorflow.org/guide/function)
+
 ### tf static graph
 ```python
 @tf.function
