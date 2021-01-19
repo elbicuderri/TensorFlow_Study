@@ -53,7 +53,7 @@ tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보
 self.trainable = True
 self.trainable = tf.constant(True) # ? 이런게 되는 지.. 확인 필요. 서치한 바로는 graph생성이 다시 안된다고 함. 속도 이득.
 
-참고: [tf.function](https://www.tensorflow.org/guide/function)
+# 참고: [tf.function](https://www.tensorflow.org/guide/function)
 
 self.training = True
 self.training = tf.constant(True) # ? 이런게 되는 지.. 확인 필요
