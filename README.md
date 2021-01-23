@@ -91,13 +91,13 @@ the layer will use a fast cuDNN implementation.<br>
 
 The requirements to use the cuDNN implementation are:<br>
 
-activation == tanh<br>
-recurrent_activation == sigmoid<br>
-recurrent_dropout == 0<br>
-unroll is False<br>
-use_bias is True<br>
-Inputs, if use masking, are strictly right-padded.<br>
-Eager execution is enabled in the outermost context.<br>
+1. activation == tanh<br>
+2. recurrent_activation == sigmoid<br>
+3. recurrent_dropout == 0<br>
+4. unroll is False<br>
+5. use_bias is True<br>
+6. Inputs, if use masking, are strictly right-padded.<br>
+7. Eager execution is enabled in the outermost context.<br>
 
 
 
