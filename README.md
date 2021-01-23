@@ -45,6 +45,24 @@ for i, (img, label) in enumerate(train_loader):
 tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
 ```
 
+### tf LSTM(ver 2.4.0)의 충격적인 설명...
+See the Keras RNN API guide for details about the usage of RNN API.
+
+Based on available runtime hardware and constraints, this layer will choose different implementations (cuDNN-based or pure-TensorFlow) to maximize the performance.<br>
+If a GPU is available and all the arguments to the layer meet the requirement of the CuDNN kernel (see below for details), the layer will use a fast cuDNN implementation.
+
+The requirements to use the cuDNN implementation are:
+
+activation == tanh
+recurrent_activation == sigmoid
+recurrent_dropout == 0
+unroll is False
+use_bias is True
+Inputs, if use masking, are strictly right-padded.
+Eager execution is enabled in the outermost context.
+---
+
+
 ### tf는 bn 과 dropout을 어떻게 관리하지?(custom train일 때...)
 >
 > like this... 아마도?
