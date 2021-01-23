@@ -143,9 +143,10 @@ class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨.
 
 ```
 
-### concatenate
+### Concatenate
 ```python
-out = concatenate([in1, in2])
+out = tf.keras.layers.Concatenate(axis=-1)([in1, in2]) # default: axis=-1
+out = tf.keras.layers.concatenate([in1, in2])
 ```
 
 ### model.summary()
