@@ -45,7 +45,7 @@ for i, (img, label) in enumerate(train_loader):
 tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
 ```
 
-### tf.keras.layers.LSTM(ver 2.4.1)에 대한 설명...
+### tf.keras.layers.LSTM(ver 2.4.1)에 대한 설명
 See the [Keras RNN API guide](https://www.tensorflow.org/guide/keras/rnn) for details about the usage of RNN API.
 
 Based on available runtime hardware and constraints, this layer will choose different implementations(cuDNN-based or pure-TensorFlow)<br>
