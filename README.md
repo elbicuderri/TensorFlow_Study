@@ -45,11 +45,13 @@ for i, (img, label) in enumerate(train_loader):
 tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
 ```
 
-### tf.keras.layers.LSTM(ver 2.4.1)의 충격적인 설명...
-See the Keras RNN API guide for details about the usage of RNN API.
+### tf.keras.layers.LSTM(ver 2.4.1)에 대한 설명...
+See the [Keras RNN API guide](https://www.tensorflow.org/guide/keras/rnn) for details about the usage of RNN API.
 
-Based on available runtime hardware and constraints, this layer will choose different implementations (cuDNN-based or pure-TensorFlow) to maximize the performance.<br>
-If a GPU is available and all the arguments to the layer meet the requirement of the CuDNN kernel (see below for details), the layer will use a fast cuDNN implementation.
+Based on available runtime hardware and constraints, this layer will choose different implementations(cuDNN-based or pure-TensorFlow)<br>
+to maximize the performance.<br>
+If a GPU is available and all the arguments to the layer meet the requirement of the CuDNN kernel(see below for details), 
+the layer will use a fast cuDNN implementation.<br>
 
 The requirements to use the cuDNN implementation are:
 
