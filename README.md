@@ -82,25 +82,58 @@ print(out4.shape) # (1, 64, 64, 6)
 tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보자
 ```
 
+### tf.keras.layers.LSTM(ver 2.4.1)에 대한 설명
+See the [Keras RNN API guide](https://www.tensorflow.org/guide/keras/rnn) for details about the usage of RNN API.
+
+Based on available runtime hardware and constraints, this layer will choose different implementations(cuDNN-based or pure-TensorFlow)<br>
+to maximize the performance.<br>
+If a GPU is available and all the arguments to the layer meet the requirement of the CuDNN kernel(see below for details), 
+the layer will use a fast cuDNN implementation.<br>
+
+The requirements to use the cuDNN implementation are:
+
+activation == tanh
+recurrent_activation == sigmoid
+recurrent_dropout == 0
+unroll is False
+use_bias is True
+Inputs, if use masking, are strictly right-padded.
+Eager execution is enabled in the outermost context.
+
+
+
 ### tf는 bn 과 dropout을 어떻게 관리하지?(custom train일 때...)
 >
 > like this... 아마도?
 >
 ```python
 self.trainable = True
+self.trainable = tf.constant(True) # ? 이런게 되는 지.. 확인 필요. 서치한 바로는 graph생성이 다시 안된다고 함. 속도 이득.
+
+# 참고: [tf.function](https://www.tensorflow.org/guide/function)
+
 self.training = True
+self.training = tf.constant(True) # ? 이런게 되는 지.. 확인 필요
+
 self.batchnorm = BatchNormalization(trainable=self.trainable)
 self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.training)
 
 for epoch in range(epochs):
     for i, (img, label) in enumerate(train_loader):
         model.trainable = True
+        self.trainable = tf.constant(True)
+        
         model.training = True
+        self.training = tf.constant(True)
+        
         model_params = model.trainable_variables
 
     for j, (val_img, val_label) in enumerate(valid_loader):
         model.trainable = False
-        model.training = False            
+        model.trainable = tf.constant(False)
+        
+        model.training = False
+        model.training = tf.constant(False)
 # 아마도 해결? batchnorm은 따로 할 필요 없고 dropout만 train, infer시 바꾸면 된다.
 # 아니다 model.trainable = False 설정해야 한다. resnet/tf_resnet_updated.py 참고
 # 핸즈온 머신러닝 2판 p494 "가장 중요한 것은 이 훈련 반복이 훈련과 테스트 시에 
@@ -167,9 +200,10 @@ class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨.
 
 ```
 
-### concatenate
+### Concatenate
 ```python
-out = concatenate([in1, in2])
+out = tf.keras.layers.Concatenate(axis=-1)([in1, in2]) # default: axis=-1
+out = tf.keras.layers.concatenate([in1, in2])
 ```
 
 ### model.summary()
