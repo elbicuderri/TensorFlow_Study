@@ -47,7 +47,6 @@ print(out3.shape) # (1, 65, 65, 6)
 print(out4.shape) # (1, 64, 64, 6)
 ```
 
-
 [tf.function 공부](https://www.tensorflow.org/guide/function)
 
 ### tf static graph
@@ -102,61 +101,31 @@ Eager execution is enabled in the outermost context.
 
 
 
-### tf는 bn 과 dropout을 어떻게 관리하지?(custom train일 때...)
+### tf 2.0에서 subclassing model API 사용시 BatchcNorm 과 Dropout 관리법
 >
-> like this... 아마도?
 >
 ```python
-self.trainable = True
-self.trainable = tf.constant(True) # ? 이런게 되는 지.. 확인 필요. 서치한 바로는 graph생성이 다시 안된다고 함. 속도 이득.
+class Model(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        ...
+        self.trainable = tf.constant(True) # 서치한 바로는 graph생성이 다시 안된다고 함. 속도 이득.
+        self.training = tf.constant(True)
 
-# 참고: [tf.function](https://www.tensorflow.org/guide/function)
-
-self.training = True
-self.training = tf.constant(True) # ? 이런게 되는 지.. 확인 필요
-
-self.batchnorm = BatchNormalization(trainable=self.trainable)
-self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.training)
+        self.batchnorm = BatchNormalization(trainable=self.trainable)
+        self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.training)
 
 for epoch in range(epochs):
     for i, (img, label) in enumerate(train_loader):
-        model.trainable = True
-        self.trainable = tf.constant(True)
-        
-        model.training = True
-        self.training = tf.constant(True)
+        model.trainable = tf.constant(True) # training 모드
+        model.training = tf.constant(True) # training 모드
         
         model_params = model.trainable_variables
 
     for j, (val_img, val_label) in enumerate(valid_loader):
-        model.trainable = False
-        model.trainable = tf.constant(False)
-        
-        model.training = False
-        model.training = tf.constant(False)
-# 아마도 해결? batchnorm은 따로 할 필요 없고 dropout만 train, infer시 바꾸면 된다.
-# 아니다 model.trainable = False 설정해야 한다. resnet/tf_resnet_updated.py 참고
-# 핸즈온 머신러닝 2판 p494 "가장 중요한 것은 이 훈련 반복이 훈련과 테스트 시에 
-# 다르게 동작하는 층(예를 들면 BatchNormalizatation이나 Dropout)을 
-# 다루지 못한다는 점입니다. 이를 처리하려면 training=True로 모델을 호출하여 
-# 필요한 모든 층에 이 매개변수가 전파되도록 해야 합니다." - 여길 보면 저렇게 하면 맞는 거 같긴 한데...
+        model.trainable = tf.constant(False) # evaluating 모드
+        model.training = tf.constant(False) # evaluating 모드
 ```
-The meaning of setting layer.trainable = False is to freeze the layer, 
-i.e. its internal state will not change during training: its trainable weights will not be updated during fit() or train_on_batch(), and its state updates will not be run.
-
-Usually, this does not necessarily mean that the layer is run in inference mode (which is normally controlled by the training argument that can be passed when calling a layer). "Frozen state" and "inference mode" are two separate concepts.
-
-However, in the case of the BatchNormalization layer, setting trainable = False on the layer means that the layer will be subsequently run in inference mode (meaning that it will use the moving mean and the moving variance to normalize the current batch, rather than using the mean and variance of the current batch).
-
-This behavior has been introduced in TensorFlow 2.0, in order to enable layer.trainable = False to produce the most commonly expected behavior in the convnet fine-tuning use case.
-
-Note that:
-This behavior only occurs as of TensorFlow 2.0. In 1.*, setting layer.trainable = False would freeze the layer but would not switch it to inference mode.
-Setting trainable on an model containing other layers will recursively set the trainable value of all inner layers.
-If the value of the trainable attribute is changed after calling compile() on a model, the new value doesn't take effect for this model until compile() is called again.
-
-Reference:
-Ioffe and Szegedy, 2015.
 
 ### tf.data.Dataset 사용법 (torch의 DataLoader와 비슷)
 ```python
@@ -167,8 +136,9 @@ data_loader = dataset.map(preprocess).shuffle(60000, reshuffle_each_iteration=Tr
 #map : 전처리함수(data 하나에 대한 preprocess 함수를 작성하면 된다)
 ### 예를 들면 이렇게
 def preprocess(x, y):
-    x = tf.reshape(x, [32, 32, 3])
-    image = tf.cast(x, tf.float32) / 255.0
+    image = tf.reshape(x, [32, 32, 3])
+    image = tf.cast(image, tf.float32) / 255.0
+    
     label = tf.one_hot(y, depth=10)
     label = tf.squeeze(label) # [1, 10] -> [10]
     return image, label
@@ -190,7 +160,7 @@ class Model(tf.keras.Model):
         self.block = tf.keras.Model.Sequential([ ... ]) # 이것도 안되네요.. 그냥 함수로 짜야되나보네요..? 귀찮..
 
 
-class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨.
+class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨. TF ver 올라가면서 위 두 방법도 사용가능한 듯.
     def __init__(self):
         super(Block, self).__init__()
         
@@ -210,8 +180,6 @@ out = tf.keras.layers.concatenate([in1, in2])
 >
 > subclassing API 방식 model을 만들면 model.summary() 가 안된다.
 > 
-> 대충 방법은 알 거 같은데 귀찮다..
->
 ```python
     def model(self):
         inputs = tf.keras.Input(shape=(32, 32, 3))
@@ -225,9 +193,9 @@ model.model().summary()
 ```
 
 
-### einsum is all you need
+### einsum
 >
-> tensorflow도 einsum을 지원한다. numpy도 지원한다. 앞으로 연산할때 shape 생각하기 쉬워질듯
+> tensorflow도 einsum을 지원한다. numpy도 지원한다.
 >
 
 ```python
@@ -264,9 +232,12 @@ print(y2.shape)
 ```python
 import tensorflow.keras.backend as K
 # default : channels_last
+
 print(K.image_data_format())
+
 K.set_image_data_format('channels_first')
 print(K.image_data_format())
+
 K.set_image_data_format('channels_last')
 print(K.image_data_format())
 ```
