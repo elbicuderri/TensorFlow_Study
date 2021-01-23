@@ -11,6 +11,43 @@ for i, (img, label) in enumerate(train_loader):
     optimizer.apply_gradients(zip(grads, model_params)) # optimizer.step()
 ```
 
+### Conv2DTranspose
+```python
+import tensorflow as tf
+from tensorflow.keras.layers import *
+
+cifar = tf.random.uniform([1, 32, 32, 3], maxval=1)
+
+out1 = Conv2DTranspose(filters=6,
+                      kernel_size=3,
+                      strides=1,
+                      padding='valid')(cifar)
+
+out2 = Conv2DTranspose(filters=6,
+                      kernel_size=3,
+                      strides=1,
+                      padding='same')(cifar)
+
+out3 = Conv2DTranspose(filters=6,
+                      kernel_size=3,
+                      strides=2,
+                      padding='valid')(cifar)
+
+out4 = Conv2DTranspose(filters=6,
+                      kernel_size=3,
+                      strides=2,
+                      padding='same')(cifar)
+
+print(out1.shape) # (1, 34, 34, 6)
+
+print(out2.shape) # (1, 32, 32, 6)
+
+print(out3.shape) # (1, 65, 65, 6)
+
+print(out4.shape) # (1, 64, 64, 6)
+```
+
+
 [tf.function 공부](https://www.tensorflow.org/guide/function)
 
 ### tf static graph
