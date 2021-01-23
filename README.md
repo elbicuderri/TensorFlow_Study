@@ -82,22 +82,22 @@ tf.debugging.set_log_device_placement(True) # 무슨 일이 일어나는 지 보
 ```
 
 ### tf.keras.layers.LSTM(ver 2.4.1)에 대한 설명
-See the [Keras RNN API guide](https://www.tensorflow.org/guide/keras/rnn) for details about the usage of RNN API.
+See the [Keras RNN API guide](https://www.tensorflow.org/guide/keras/rnn) for details about the usage of RNN API.<br>
 
-Based on available runtime hardware and constraints, this layer will choose different implementations(cuDNN-based or pure-TensorFlow)<br>
+Based on available runtime hardware and constraints, this layer will choose **different implementations**(cuDNN-based or pure-TensorFlow)<br>
 to maximize the performance.<br>
-If a GPU is available and all the arguments to the layer meet the requirement of the CuDNN kernel(see below for details), 
+If a GPU is available and all the arguments to the layer meet the requirement of the CuDNN kernel(see below for details),<br>
 the layer will use a fast cuDNN implementation.<br>
 
-The requirements to use the cuDNN implementation are:
+The requirements to use the cuDNN implementation are:<br>
 
-activation == tanh
-recurrent_activation == sigmoid
-recurrent_dropout == 0
-unroll is False
-use_bias is True
-Inputs, if use masking, are strictly right-padded.
-Eager execution is enabled in the outermost context.
+activation == tanh<br>
+recurrent_activation == sigmoid<br>
+recurrent_dropout == 0<br>
+unroll is False<br>
+use_bias is True<br>
+Inputs, if use masking, are strictly right-padded.<br>
+Eager execution is enabled in the outermost context.<br>
 
 
 
@@ -113,7 +113,7 @@ class Model(tf.keras.Model):
         self.training = tf.constant(True)
 
         self.batchnorm = BatchNormalization(trainable=self.trainable)
-        self.dropout = tf.keras.layers.Dropout(rate=self.rate, training=self.training)
+        self.dropout = Dropout(rate=self.rate, training=self.training)
 
 for epoch in range(epochs):
     for i, (img, label) in enumerate(train_loader):
