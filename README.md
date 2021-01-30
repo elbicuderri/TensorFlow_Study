@@ -192,6 +192,45 @@ model.model().summary()
 # 해결완료. block으로 쌓인 부분 안 보임. 더 좋은 방법 찾아봅시다.
 ```
 
+### control the randomness
+```python
+import tensorflow as tf
+import os
+import random
+import numpy as np
+
+def set_seeds(seed=SEED):
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    random.seed(seed)
+    tf.random.set_seed(seed)
+    np.random.seed(seed)
+    
+def set_global_determinism(seed=SEED, fast_n_close=False):
+    """
+        Enable 100% reproducibility on operations related to tensor and randomness.
+        Parameters:
+        seed (int): seed value for global randomness
+        fast_n_close (bool): whether to achieve efficient at the cost of determinism/reproducibility
+    """
+    set_seeds(seed=seed)
+    if fast_n_close:
+        return
+    
+    """
+    logging.warning("*******************************************************************************")
+    logging.warning("*** set_global_determinism is called,setting full determinism, will be slow ***")
+    logging.warning("*******************************************************************************")
+    """
+    
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+    os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
+    # https://www.tensorflow.org/api_docs/python/tf/config/threading/set_inter_op_parallelism_threads
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+    from tfdeterminism import patch
+    patch()
+```
+
 
 ### einsum
 >
