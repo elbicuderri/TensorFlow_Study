@@ -233,10 +233,6 @@ def set_global_determinism(seed=SEED, fast_n_close=False):
 
 
 ### einsum
->
-> tensorflow도 einsum을 지원한다. numpy도 지원한다.
->
-
 ```python
 import tensorflow as tf 
 
