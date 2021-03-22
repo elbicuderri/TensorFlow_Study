@@ -37,7 +37,8 @@ class LSTMCell(tf.keras.Model):
         hidden_state = self.dot(out, self.tanh(cell_state))
         
         return out, hidden_state, cell_state
-    
+
+## not implemented yet
 class LSTM(tf.keras.Model): 
     def __init__(self, input_size, hidden_size, num_layers, bidirectional=False):
         super(LSTM, self).__init__()
