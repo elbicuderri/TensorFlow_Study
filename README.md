@@ -263,7 +263,7 @@ print(y2.shape)
 ```
 
 
-### tf의 data_format의 확인 하는 법
+### tf의 data_format을 확인 하는 법
 ```python
 import tensorflow.keras.backend as K
 # default : channels_last
