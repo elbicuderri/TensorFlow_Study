@@ -158,11 +158,11 @@ class Model(tf.keras.Model):
     def __init__(self):
         super().__init__()
     
-        self.block = tf.keras.models.Sequential([ ... ]) # 이런 식으론 되지 않았다. 생각중.
-        self.block = tf.keras.Model.Sequential([ ... ]) # 이것도 안되네요.. 그냥 함수로 짜야되나보네요..? 귀찮..
+        self.block = tf.keras.models.Sequential([ ... ]) # TF ver 올라가면서 사용 가능.
+        self.block = tf.keras.Model.Sequential([ ... ]) # TF ver 올라가면서 사용 가능.
 
 
-class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨. TF ver 올라가면서 위 두 방법도 사용가능한 듯.
+class Block(tf.keras.layers.Layer):   # 해결 완료. class로 선언해야됨. 
     def __init__(self):
         super(Block, self).__init__()
         
