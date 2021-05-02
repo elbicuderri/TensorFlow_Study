@@ -178,7 +178,7 @@ out = tf.keras.layers.Concatenate(axis=-1)([in1, in2]) # default: axis=-1
 out = tf.keras.layers.concatenate([in1, in2])
 ```
 
-### model.summary()
+### model.summary() && plot_model()
 >
 > subclassing API 방식 model을 만들면 model.summary() 가 안된다.
 > 
@@ -190,8 +190,9 @@ out = tf.keras.layers.concatenate([in1, in2])
 
 model = Model()
 
-model.model().summary() 
-# 해결완료. block으로 쌓인 부분 안 보임. 더 좋은 방법 찾아봅시다.
+model.model.().summary()
+
+plot_model(model.model(), to_file='model.png', show_shapes=True, show_layer_names=False)
 ```
 
 ### control the randomness
